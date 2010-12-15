@@ -9,7 +9,8 @@ var Canvas = require('canvas'),
     http = require('http'),
     static = require('node-static'),
     url = require('url'),
-    fs = require('fs');
+    fs = require('fs'),
+    utils = require('./utils');
     
 var project = {
     'FeatureCollection': function(fc) { fc.features.forEach(project.Feature); },
@@ -105,15 +106,19 @@ function tile(req, res) {
                 console.log('streaming done in', new Date - d, 'ms');
 
                 var tilePath = './public/tiles/'+coord.join('/')+'.png';
-                var parts = tilePath.split('/'); // TODO: node has path utilities?
-                for (var i = 3; i < parts.length; i++) {
-                  console.log('attempting mkdir %s', parts.slice(0,i).join('/'));
-                  try {
-                    fs.mkdirSync(parts.slice(0,i).join('/'), 0755);
-                  } catch(e) { /* oh well */ }
-                }
-                fs.writeFile(tilePath, buffer, function(error, rsp) {
-                    if (error) { console.log(error); }
+                utils.ensureDirExists(tilePath, function(error, rsp) {
+                    if (error) { 
+                        console.log('error ensureDirExists');
+                        console.error(error);
+                    }
+                    else {
+                        fs.writeFile(tilePath, buffer, function(error, rsp) {
+                            if (error) { 
+                                console.log('error writeFile');
+                                console.error(error);
+                            }
+                        });
+                    }
                 });
             });
         }

@@ -7,6 +7,7 @@
 
 var Canvas = require('canvas'),
     http = require('http'),
+    static = require('node-static'),
     url = require('url'),
     fs = require('fs');
     
@@ -51,8 +52,8 @@ var layers = [
     Layer('./naturalearthdata/10m_lakes.js', [ { fillStyle: '#ddddff' } ]),
     Layer('./naturalearthdata/10m_us_parks_area.js', [ { fillStyle: '#ddffdd' } ]),
     Layer('./naturalearthdata/10m-urban-area.js', [ { fillStyle: '#eeeedd' } ]),
-    Layer('./naturalearthdata/10m_railroads.js', [ { strokeStyle: '#777777' } ]),
-    Layer('./naturalearthdata/10m_roads.js', [ { strokeStyle: '#aa8888' } ])
+//    Layer('./naturalearthdata/10m_railroads.js', [ { strokeStyle: '#777777' } ]),
+//    Layer('./naturalearthdata/10m_roads.js', [ { strokeStyle: '#aa8888' } ]) 
 // TODO more boundaries from http://www.naturalearthdata.com/downloads/10m-cultural-vectors/
 //    Layer('./naturalearthdata/10m_geography_regions_polys.js', [ { strokeStyle: 'rgba(0,0,0,0.2)' } ]),    
 //    Layer('./naturalearthdata/10m_populated_places_simple.js', [ { fillStyle: '#ffffee' } ]),
@@ -65,68 +66,57 @@ var t = +new Date
 layers.forEach(project.FeatureCollection);
 console.log('done projecting in', new Date - t, 'ms'); 
 
-function serveFile(filename, req, res) {
-  fs.readFile(filename, "binary", function(err, file) {
-    if(err) {
-      res.writeHead(500, {"Content-Type": "text/plain"});
-      res.write(err + "\n");
-      res.end();
-      return;
-    }
-    var suffix = filename.split('.').pop();
-    var contentTypes = { "html": "text/html", "js": "application/x-javascript" };
-    if (suffix in contentTypes) {
-      res.writeHead(200, { "Content-Type": contentTypes[suffix] });
-      res.end(file, "utf8");
-    }
-    else {
-      res.writeHead(200);
-      res.end(file, "binary");
-    }
-  });
-}
+var fileServer = new static.Server('./public');
 
 function tile(req, res) {
 
-    var path = url.parse(req.url).pathname;
-    if (path == '/' || path == '/index.html') {
-      serveFile('index.html', req, res);
-      return;
-    }
-    else if (path == '/modestmaps.js') {
-      serveFile('modestmaps.js', req, res);
-      return;
-    }
+    fileServer.serve(req, res, function (err, result) {
+        if (err) { // There was an error serving the file
+            var d = new Date();
+        
+            var coord = req.url.match(/(\d+)/g);
+            if (!coord || coord.length != 3) {
+                console.error(req.url, 'not a coord, match =', coord);
+                res.writeHead(404);
+                res.end();
+                return;
+            }
+        
+            coord = coord.map(Number);
+            //console.log('got coord', coord);
+        
+            var canvas = new Canvas(256,256),
+                ctx = canvas.getContext('2d');
+        
+            ctx.fillStyle = bgColor;
+            ctx.fillRect(0,0,256,256);
+        
+            // there's no spatial filtering so this part is *SLOW* for big data
+            renderData(ctx, coord[0], coord[1], coord[2], function() {
+                console.log('rendering done in', new Date - d, 'ms');
+                d = new Date();
+        
+                // I've messed around with all kinds of "clever" ways to make this faster
+                // but the nice truth is it takes about <20ms to write out the buffer
+                // once renderData has finished, so why worry about it being synchronous?
+                res.writeHead(200, {'Content-Type': 'image/png'});
+                var buffer = canvas.toBuffer();
+                res.end(buffer);
+                console.log('streaming done in', new Date - d, 'ms');
 
-    var d = new Date();
-    
-    var coord = req.url.match(/(\d+)/g);
-    if (!coord || coord.length != 3) {
-        console.error(req.url, 'not a coord, match =', coord);
-        res.writeHead(404);
-        res.end();
-        return;
-    }
-    
-    coord = coord.map(Number);
-    //console.log('got coord', coord);
-
-    var canvas = new Canvas(256,256),
-        ctx = canvas.getContext('2d');
-    
-    ctx.fillStyle = bgColor;
-    ctx.fillRect(0,0,256,256);
-    
-    renderData(ctx, coord[0], coord[1], coord[2], function() {
-        console.log('rendering done in', new Date - d, 'ms');
-        d = new Date();
-    
-        // I've messed around with all kinds of "clever" ways to make this faster
-        // but the nice truth is it takes about <20ms to write out the buffer
-        // once renderData has finished, so why worry about it being synchronous?
-        res.writeHead(200, {'Content-Type': 'image/png'});    
-        res.end(canvas.toBuffer());
-        console.log('streaming done in', new Date - d, 'ms');
+                var tilePath = './public/tiles/'+coord.join('/')+'.png';
+                var parts = tilePath.split('/'); // TODO: node has path utilities?
+                for (var i = 3; i < parts.length; i++) {
+                  console.log('attempting mkdir %s', parts.slice(0,i).join('/'));
+                  try {
+                    fs.mkdirSync(parts.slice(0,i).join('/'), 0755);
+                  } catch(e) { /* oh well */ }
+                }
+                fs.writeFile(tilePath, buffer, function(error, rsp) {
+                    if (error) { console.log(error); }
+                });
+            });
+        }
     });
 }
 

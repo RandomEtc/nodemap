@@ -190,11 +190,5 @@ function renderLayers(theLayers, ctx, callback, sc) {
     }    
 }
 
-var server = http.createServer(tile).listen(3000);
-/*
-var nodes = require("./vendor/multi-node/multi-node").listen({
-    port: 3000, 
-    nodes: 4
-}, server);
-*/
-console.log('listening on 3000');
+var server = http.createServer(tile).listen(80);
+console.log('listening on 80');

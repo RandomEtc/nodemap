@@ -1,2 +1,5 @@
 naturalearthdata/raw
+naturalearthdata/10m_geography_regions_polys.js
+naturalearthdata/10m_populated_places_simple.js
+naturalearthdata/10m_roads_north_america.js
 public/tiles/*

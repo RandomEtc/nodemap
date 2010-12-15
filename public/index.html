@@ -12,7 +12,7 @@ html, body, #map {
 var map;
 window.onload = function() {
     map = new com.modestmaps.Map('map', 
-                                 new com.modestmaps.TemplatedMapProvider('/{Z}/{X}/{Y}.png')); 
+                                 new com.modestmaps.TemplatedMapProvider('/tiles/{Z}/{X}/{Y}.png')); 
     map.setCenterZoom(new com.modestmaps.Location(38.457, -93.772), 3);
 }
 </script>

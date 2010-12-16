@@ -112,10 +112,18 @@ function tile(req, res) {
                         console.error(error);
                     }
                     else {
-                        fs.writeFile(tilePath, buffer, function(error, rsp) {
+                        fs.writeFile(tilePath+'.tmp', buffer, function(error, rsp) {
                             if (error) { 
                                 console.log('error writeFile');
                                 console.error(error);
+                            }
+                            else {
+                                fs.rename(tilePath+'.tmp', tilePath, function(error) {
+                                    if (error) { 
+                                        console.log('error renaming');
+                                        console.error(error);
+                                    }
+                                });
                             }
                         });
                     }

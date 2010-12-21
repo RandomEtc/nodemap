@@ -1,0 +1,17 @@
+{
+  "name": "NodeMap",
+  "description": "quick map tile renderer for nodejs camp",
+  "version": "0.0.0",
+  "homepage": "https://github.com/RandomEtc/nodemap",
+  "author": "Tom Carden (https://github.com/RandomEtc/)",
+  "directories": {
+    "lib": ""
+  },
+  "engines": {
+    "node": "0.2.5"
+  }
+  { "dependencies" :
+    { "canvas" : ">=0.4.1" },
+    { "node-static" : ">=0.5.3" }
+  }
+}

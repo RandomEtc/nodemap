@@ -1,4 +1,7 @@
-This is an extremely naive proof-of-concept.
+This is an extremely naive proof-of-concept. It will render polygons and lines
+from GeoJSON files into 256x256px mercator tiles suitable for overlaying on
+Google Maps (or Bing Maps, MapQuest, Yahoo Maps, OpenLayers or Tile5 or 
+Polymaps or Modest Maps).
 
 There is no spatial indexing so every feature is drawn for every tile.
 
@@ -19,4 +22,8 @@ on your needs. https://github.com/RandomEtc/js-vector-maps
 
 https://github.com/RandomEtc/shapefile-js might also be relevant, there's 
 more canvas rendering ideas in there.
+
+This is the first time I've used npm to manage a project, it's not published 
+yet though, I'm still digesting everything it can do:
+http://blog.izs.me/post/1675072029/10-cool-things-you-probably-didnt-realize-npm-could-do
 

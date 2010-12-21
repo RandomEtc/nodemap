@@ -1,0 +1,22 @@
+This is an extremely naive proof-of-concept.
+
+There is no spatial indexing so every feature is drawn for every tile.
+
+Data is loaded from GeoJSON files so large data sources aren't possible
+(v8 doesn't like evaling or JSON.parsing 100MB files)
+
+I'm experimenting with simple caching to disk which currently seems to
+break (but not straight away). Contributions welcome!
+
+It would probably tidy this up a lot to factor out the rendering into its 
+own reusable file and handle URL matching, static files etc with Connect 
+or Express.
+
+For reasons that aren't entirely clear to me, I didn't use my existing
+javascript canvas map rendering code from. It would be nice to integrate these
+two projects and have some code that could work on client or server depending 
+on your needs. https://github.com/RandomEtc/js-vector-maps
+
+https://github.com/RandomEtc/shapefile-js might also be relevant, there's 
+more canvas rendering ideas in there.
+

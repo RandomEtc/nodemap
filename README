@@ -5,6 +5,9 @@ Polymaps or Modest Maps).
 
 There is no spatial indexing so every feature is drawn for every tile.
 
+Node.js is single-threaded so without workers or child processes this can
+only render one tile at a time. Go ahead, laugh.
+
 Data is loaded from GeoJSON files so large data sources aren't possible
 (v8 doesn't like evaling or JSON.parsing 100MB files)
 
@@ -16,12 +19,13 @@ own reusable file and handle URL matching, static files etc with Connect
 or Express.
 
 For reasons that aren't entirely clear to me, I didn't use my existing
-javascript canvas map rendering code from. It would be nice to integrate these
+javascript canvas map rendering code [1]. It would be nice to integrate these
 two projects and have some code that could work on client or server depending 
-on your needs. https://github.com/RandomEtc/js-vector-maps
+on your needs. My hacky JS shapefile project [2] might also be relevant, there
+are a few more canvas rendering ideas in there.
 
-https://github.com/RandomEtc/shapefile-js might also be relevant, there's 
-more canvas rendering ideas in there.
+1. https://github.com/RandomEtc/js-vector-maps
+2. https://github.com/RandomEtc/shapefile-js 
 
 This is the first time I've used npm to manage a project, it's not published 
 yet though, I'm still digesting everything it can do:

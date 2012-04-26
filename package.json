@@ -8,10 +8,10 @@
     "lib": ""
   },
   "engines": {
-    "node": "0.2.5"
-  }
-  { "dependencies" :
-    { "canvas" : ">=0.4.1" },
-    { "node-static" : ">=0.5.3" }
+    "node": ">=0.2.5"
+  },
+  "dependencies" : {}
+    "canvas": ">=0.4.1",
+    "node-static": ">=0.5.3"
   }
 }
